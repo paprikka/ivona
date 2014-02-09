@@ -18,6 +18,7 @@ What I wanted to get is a simple service returning urls to audio files with answ
 1. Use ES6 Harmony compatible version of NodeJS
 2. Set up SSL certificates (find out how to create a self-signed certificate [here](https://devcenter.heroku.com/articles/ssl-certificate-self))
 
+```
     IVONA_API_KEY=" ... "
     IVONA_LOGIN_EMAIL=" ... "
     SSL_KEY=" ... "
@@ -26,6 +27,7 @@ What I wanted to get is a simple service returning urls to audio files with answ
     # optional
     PORT=3003
 
+```
 3. npm install 
 4. npm start
 
