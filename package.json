@@ -1,0 +1,17 @@
+{
+  "name": "ivona-saas",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --harmony index"
+  },
+  "author": "Rafal Pastuszak <rafal.pastuszak@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "~0.3.0",
+    "ivona": "~0.1.0",
+    "koa-router": "~3.0.1",
+    "q": "~1.0.0"
+  }
+}
