@@ -1,6 +1,6 @@
 # Ivona
 
-## The  Simplest Possible Wrapper Around Ivona REST API
+## The Simplest Possible Wrapper Around Ivona REST API
 
 ### 0. Why? 
 
