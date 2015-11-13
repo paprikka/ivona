@@ -1,58 +1,55 @@
-var https = require('https');
-var fs = require('fs');
-var koa = require('koa');
-var router = require('koa-router');
-var app = koa();
-var Q = require('q');
+const Hapi = require('hapi');
 
-
-// **Important** Do not store these variables in the repo.
-var config = {
-  PORT: process.env.PORT || 3001,
-  IVONA_API_KEY: process.env.IVONA_API_KEY,
-  IVONA_LOGIN_EMAIL: process.env.IVONA_LOGIN_EMAIL,
-  SSL_KEY: process.env.SSL_KEY,
-  SSL_CERT: process.env.SSL_CERT
-};
-
-console.log('Init::config: ', config);
-
-// Set up Ivona credentials
-var ivona = new(require('ivona'))({
-  email: config.IVONA_LOGIN_EMAIL,
-  key: config.IVONA_API_KEY
+const Ivona = require('ivona-node');
+const ivona = new Ivona({
+  accessKey: 'GDNAIBB2KFI5P6X5GHXA',
+  secretKey: 'MM8QyTTp7dC6sEH/zmBwgaZQYdWepJ50XXuIGYSs'
 });
 
-// HTTPS is required by [Sulik](https://github.com/paprikka/sulik):
-var httpsOptions = {
-  key: fs.readFileSync(config.SSL_KEY),
-  cert: fs.readFileSync(config.SSL_CERT)
+const fs = require('fs');
+
+const config = {
+  // https: {
+  //   host: '0.0.0.0',
+  //   port: 3001,
+  //   tls: {
+  //     key: fs.readFileSync('./certs/server.key'),
+  //     cert: fs.readFileSync('./certs/server.crt')
+  //   }
+  // },
+  http: {
+    host: '0.0.0.0',
+    port: 3001
+  }
 };
 
+const server = new Hapi.Server();
+
+server.connection(config.http);
+// server.connection(config.https);
 
 
-var textToSpeech = function(text) {
-  var deferred = Q.defer();
-  ivona.createSpeechFile({
-      text: text,
-      contentType: 'text/plain',
-      voiceId: 'gb_amy',
-      codecId: 'mp3/22050'
-    },
-    function(err, fileId, soundUrl) {
-      deferred.resolve(soundUrl);
-    });
-  return deferred.promise;
-};
+server.route({
+  method: 'GET',
+  path: '/',
+  handler: function(request, reply){
+    reply('pong ' + Date.now());
+  }
+})
 
-app.use(router(app));
-
-app.get('/tts/:text', function *(next) {
-  var text = decodeURIComponent(this.params.text);
-  this.result = yield textToSpeech(text);
-  this.redirect(this.result);
+server.route({
+  method: 'GET',
+  path: '/tts/{text}',
+  handler: require('./routes/tts')(ivona)
 });
 
-https.createServer(httpsOptions, app.callback()).listen(config.PORT);
+server.route({
+  method: 'GET',
+  path: '/list',
+  handler: require('./routes/list')(ivona)
+});
 
-console.log('listening on port ' + config.PORT);
+
+server.start(function() {
+  console.log('Server running at:', server.info.uri);
+});
